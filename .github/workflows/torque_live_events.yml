@@ -1,0 +1,65 @@
+name: torque_live_events
+
+# Runs the app on an emulator, adds and completes a task, and sends the two Torque Lift events to
+# ingest.torquelift.ai. Not part of the sample's own CI; started by hand or by a push to this branch.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/project-thread-madtx2
+
+jobs:
+  live_events:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Run the app on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          arch: x86
+          disable-animations: true
+          script: |
+            adb logcat -c
+            (adb logcat -v time > ${{ github.workspace }}/logcat.txt &)
+            date -u +"proof started %Y-%m-%dT%H:%M:%SZ" | tee ${{ github.workspace }}/window.txt
+            ./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.example.android.architecture.blueprints.todoapp.torquelift.TorqueLiveEventsTest --stacktrace || echo "gradle failed" >> ${{ github.workspace }}/window.txt
+            date -u +"proof ended %Y-%m-%dT%H:%M:%SZ" | tee -a ${{ github.workspace }}/window.txt
+            sleep 3
+
+      - name: What the SDK did
+        if: always()
+        run: |
+          cat window.txt || true
+          echo "--- permissions in the merged manifest"
+          find app/build -name AndroidManifest.xml -path '*merged_manifests/debug*' -exec grep -H "uses-permission" {} \; || true
+          echo "--- SDK and proof lines"
+          grep -iE "TorqueProof|uploaded|exception while uploading|SecurityException|INTERNET|UnknownHost|segment" logcat.txt | head -80 || true
+          if grep -qiE "uploaded" logcat.txt; then echo "RESULT: the SDK uploaded a batch"; else echo "RESULT: no upload seen"; exit 1; fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-events-logs
+          path: |
+            logcat.txt
+            window.txt
+            app/build/reports/androidTests
