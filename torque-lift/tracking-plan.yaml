@@ -1,0 +1,17 @@
+version: 1
+platforms: [android]
+app_path: "app"
+scope:
+  - "app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/**"
+  - "app/src/main/java/com/example/android/architecture/blueprints/todoapp/addedittask/**"
+user_id: {type: id, source: "userId"}
+buckets: [tasks]
+events:
+  Task Created:
+    bucket: tasks
+    stage: activation
+  Task Completed:
+    bucket: tasks
+    stage: engagement
+    properties:
+      task_id: {type: id, source: "task.id", required: true}
