@@ -109,6 +109,7 @@ android {
  all versions in a single place. This improves readability and helps managing project complexity.
  */
 dependencies {
+    implementation(libs.torquelift.analytics)
 
     // App dependencies
     implementation(libs.androidx.annotation)
