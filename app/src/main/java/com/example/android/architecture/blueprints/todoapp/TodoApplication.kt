@@ -30,6 +30,7 @@ class TodoApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        TorqueLiftAnalytics.start(this, consent = true)
         if (BuildConfig.DEBUG) Timber.plant(DebugTree())
     }
 }

@@ -23,6 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TorqueLiftAnalytics
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.TaskRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
@@ -114,6 +115,7 @@ class TasksViewModel @Inject constructor(
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
             taskRepository.completeTask(task.id)
+            TorqueLiftAnalytics.taskCompleted(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
             taskRepository.activateTask(task.id)
