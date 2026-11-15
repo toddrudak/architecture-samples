@@ -59,6 +59,8 @@ truth = "1.4.4"
 turbine = "0.12.1"
 
 [libraries]
+torquelift-growthbook = { module = "io.growthbook.sdk:GrowthBook", version = "10.1.0" }
+torquelift-dispatcher = { module = "io.growthbook.sdk:NetworkDispatcherOkHttp", version = "1.2.0" }
 torquelift-analytics = { module = "com.segment.analytics.kotlin:android", version = "1.27.0" }
 accompanist-appcompat-theme = { group = "com.google.accompanist", name = "accompanist-appcompat-theme", version.ref = "accompanist" }
 accompanist-flowlayout = { group = "com.google.accompanist", name = "accompanist-flowlayout", version.ref = "accompanist" }
