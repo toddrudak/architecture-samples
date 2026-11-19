@@ -53,6 +53,9 @@ object TorqueLiftAnalytics {
     /** The SDK's anonymous id, for the backend's events; null before consent. */
     fun anonymousId(): String? = send { it.anonymousId() }
 
+    /** The signed-in user's id, for the flag file of an experiment PR; null before consent or `identify`. */
+    fun userId(): String? = send { it.userId() }
+
     private fun <T> send(block: (SegmentAnalytics) -> T): T? = synchronized(lock) {
         val sdk = analytics
         if (consented && sdk != null) block(sdk) else null
@@ -73,6 +76,15 @@ object TorqueLiftAnalytics {
     fun taskCompleted(taskId: String) {
         send { it.track("Task Completed", properties {
             put("task_id", taskId)
+        }) }
+    }
+
+    /** Experiment Viewed, sent by the flag file an experiment PR adds. */
+    fun experimentViewed(experimentId: String, variationId: String, flagKey: String? = null) {
+        send { it.track("Experiment Viewed", properties {
+            put("experiment_id", experimentId)
+            put("variation_id", variationId)
+            flagKey?.let { put("flag_key", it) }
         }) }
     }
 }

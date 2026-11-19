@@ -107,6 +107,8 @@ kotlin {
  all versions in a single place. This improves readability and helps managing project complexity.
  */
 dependencies {
+    implementation(libs.torquelift.growthbook)
+    implementation(libs.torquelift.dispatcher)
     implementation(libs.torquelift.analytics)
 
     // App dependencies

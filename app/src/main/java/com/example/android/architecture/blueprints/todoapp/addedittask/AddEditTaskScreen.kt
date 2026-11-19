@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TorqueLiftFlag
 import com.example.android.architecture.blueprints.todoapp.util.AddEditTaskTopAppBar
 
 @Composable
@@ -71,8 +72,10 @@ fun AddEditTaskScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { AddEditTaskTopAppBar(topBarTitle, onBack) },
         floatingActionButton = {
+            TorqueLiftFlag(flag = "save-button-label-v1", variant = { SaveButtonWithLabel(onClick = viewModel::saveTask) }) {
             SmallFloatingActionButton(onClick = viewModel::saveTask) {
                 Icon(Icons.Filled.Done, stringResource(id = R.string.cd_save_task))
+            }
             }
         }
     ) { paddingValues ->
