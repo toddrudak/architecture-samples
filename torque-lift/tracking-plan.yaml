@@ -8,6 +8,7 @@ user_id: {type: id, source: "userId"}
 buckets: [tasks]
 events:
   Task Created:
+    deprecated: true
     bucket: tasks
     stage: activation
   Task Completed:
